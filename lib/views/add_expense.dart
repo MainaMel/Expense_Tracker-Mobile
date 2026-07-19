@@ -10,6 +10,6 @@ class AddExpenseScreen extends StatefulWidget {
 class _AddExpenseScreenState extends State<AddExpenseScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Text("AddExpenseScreen");
   }
 }

@@ -10,6 +10,6 @@ class ExpenseListScreen extends StatefulWidget {
 class _ExpenseListScreenState extends State<ExpenseListScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Text("ExpenseListScreen");
   }
 }
