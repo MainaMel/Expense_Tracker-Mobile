@@ -14,8 +14,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        title: const Text('Expense Tracker'),
+        title: const Text('Wise Wallet'),
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
         centerTitle: true,
@@ -28,6 +29,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           ),
         ],
       ),
+
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(35, 10, 35, 20),
@@ -36,10 +38,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [Image.asset('/logo.jpg', width: 180, height: 150)],
+                children: [Image.asset('/logo.png', width: 180, height: 150)],
               ),
-              const SizedBox(height: 20),
-              const Text(
+
+              SizedBox(height: 20),
+
+              Text(
                 'Full Name:',
                 style: TextStyle(
                   fontSize: 15,
@@ -47,14 +51,28 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   color: Colors.black,
                 ),
               ),
-              const TextField(
+
+              TextField(
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade400),
+                  ),
+
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: primaryColor, width: 2),
+                  ),
+
                   prefixIcon: Icon(Icons.person),
                 ),
               ),
-              const SizedBox(height: 20),
-              const Text(
+              SizedBox(height: 20),
+              Text(
                 'Username:',
                 style: TextStyle(
                   fontSize: 15,
@@ -62,14 +80,30 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   color: Colors.black,
                 ),
               ),
-              const TextField(
+
+              TextField(
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade400),
+                  ),
+
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: primaryColor, width: 2),
+                  ),
+
                   prefixIcon: Icon(Icons.person),
                 ),
               ),
-              const SizedBox(height: 20),
-              const Text(
+
+              SizedBox(height: 20),
+
+              Text(
                 'Email:',
                 style: TextStyle(
                   fontSize: 15,
@@ -77,14 +111,30 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   color: Colors.black,
                 ),
               ),
-              const TextField(
+
+              TextField(
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade400),
+                  ),
+
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: primaryColor, width: 2),
+                  ),
+
                   prefixIcon: Icon(Icons.email),
                 ),
               ),
-              const SizedBox(height: 20),
-              const Text(
+
+              SizedBox(height: 20),
+
+              Text(
                 'Password:',
                 style: TextStyle(
                   fontSize: 15,
@@ -92,15 +142,31 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   color: Colors.black,
                 ),
               ),
-              const TextField(
+
+              TextField(
                 obscureText: true,
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade400),
+                  ),
+
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: primaryColor, width: 2),
+                  ),
+
                   prefixIcon: Icon(Icons.lock),
                 ),
               ),
-              const SizedBox(height: 20),
-              const Text(
+
+              SizedBox(height: 20),
+
+              Text(
                 'Confirm Password:',
                 style: TextStyle(
                   fontSize: 15,
@@ -108,14 +174,29 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   color: Colors.black,
                 ),
               ),
-              const TextField(
+
+              TextField(
                 obscureText: true,
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade400),
+                  ),
+
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: primaryColor, width: 2),
+                  ),
                   prefixIcon: Icon(Icons.lock),
                 ),
               ),
-              const SizedBox(height: 20),
+
+              SizedBox(height: 20),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -126,18 +207,25 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     color: primaryColor,
                     textColor: Colors.white,
                     height: 45,
-                    minWidth: 100,
-                    child: const Text(
+                    minWidth: 200,
+
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+
+                    child: Text(
                       'Register',
                       style: TextStyle(
                         fontSize: 15,
-                        fontWeight: FontWeight.w400,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+
+              SizedBox(height: 20),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -145,6 +233,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     onTap: () {
                       Get.toNamed("/");
                     },
+
                     child: Text(
                       'Already registered? Login',
                       style: TextStyle(color: secondaryColor),

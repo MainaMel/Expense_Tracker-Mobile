@@ -15,19 +15,20 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        title: Text('Expense Tracker'),
+        title: Text('Wise Wallet'),
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () {
-              // Handle settings button press
-            },
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: Icon(Icons.settings),
+        //     onPressed: () {
+        //       // Handle settings button press
+        //     },
+        //   ),
+        // ],
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(35, 10, 35, 0),
@@ -36,9 +37,33 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [Image.asset('/logo.jpg', width: 180, height: 150)],
+              children: [Image.asset('/logo.png', width: 180, height: 150)],
             ),
-            SizedBox(height: 30),
+
+            // Welcome back part
+            SizedBox(height: 10),
+            Center(
+              child: Text(
+                "Welcome Back!",
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: primaryColor,
+                ),
+              ),
+            ),
+
+            // SizedBox(height: 8),
+            Center(
+              child: Text(
+                "Sign in to continue managing your finances.",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 15, color: secondaryText),
+              ),
+            ),
+
+            SizedBox(height: 10),
+
             Text(
               "Username:",
               style: TextStyle(
@@ -50,12 +75,25 @@ class _LoginScreenState extends State<LoginScreen> {
 
             TextField(
               decoration: InputDecoration(
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey.shade400),
+                ),
+
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: primaryColor, width: 2),
+                ),
                 prefixIcon: Icon(Icons.person),
               ),
             ),
 
-            SizedBox(height: 20),
+            SizedBox(height: 15),
+
             Text(
               "Password:",
               style: TextStyle(
@@ -67,7 +105,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
             TextField(
               decoration: InputDecoration(
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey.shade400),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: primaryColor, width: 2),
+                ),
+
                 prefixIcon: Icon(Icons.lock),
               ),
             ),
@@ -84,12 +134,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                   color: primaryColor,
                   textColor: Colors.white,
+                  height: 45,
+                  minWidth: 200,
+
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+
                   child: Text(
                     'Login',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
-                  height: 45,
-                  minWidth: 100,
                 ),
               ],
             ),
