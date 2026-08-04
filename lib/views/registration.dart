@@ -44,7 +44,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               SizedBox(height: 20),
 
               Text(
-                'Full Name:',
+                'First Name:',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w400,
@@ -73,7 +73,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               ),
               SizedBox(height: 20),
               Text(
-                'Username:',
+                'Last Name:',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w400,

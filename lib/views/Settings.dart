@@ -96,7 +96,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   borderRadius: BorderRadius.circular(15),
                 ),
 
-                child: const ListTile(
+                child: ListTile(
                   leading: Icon(Icons.info, color: primaryColor),
 
                   title: Text("About Wise Wallet"),

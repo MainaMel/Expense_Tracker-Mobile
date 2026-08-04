@@ -1,7 +1,7 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/configs/colors.dart';
-import 'package:flutter_application_1/views/Settings.dart';
+import 'package:flutter_application_1/views/settings.dart';
 import 'package:flutter_application_1/views/add_expense.dart';
 import 'package:flutter_application_1/views/dashboard.dart';
 import 'package:flutter_application_1/views/profile.dart';

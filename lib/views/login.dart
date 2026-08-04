@@ -1,8 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 
 import 'package:flutter_application_1/configs/colors.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:http/http.dart' as http;
+
+TextEditingController emailController = TextEditingController();
+TextEditingController passwordController = TextEditingController();
+
+var store = GetStorage();
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,6 +23,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
+    emailController.text = store.read("email") ?? "";
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
@@ -31,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
         // ],
       ),
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(35, 10, 35, 0),
+        padding: EdgeInsets.fromLTRB(35, 10, 35, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -65,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
             SizedBox(height: 10),
 
             Text(
-              "Username:",
+              "Email:",
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w400,
@@ -74,6 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
 
             TextField(
+              controller: emailController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -104,20 +115,20 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
 
             TextField(
+              // controller: passwordController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
 
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey.shade400),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: primaryColor, width: 2),
-                ),
-
+                // enabledBorder: OutlineInputBorder(
+                //   borderRadius: BorderRadius.circular(12),
+                //   borderSide: BorderSide(color: Colors.grey.shade400),
+                // ),
+                // focusedBorder: OutlineInputBorder(
+                //   borderRadius: BorderRadius.circular(12),
+                //   borderSide: BorderSide(color: primaryColor, width: 2),
+                // ),
                 prefixIcon: Icon(Icons.lock),
               ),
             ),
@@ -128,9 +139,26 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 MaterialButton(
-                  onPressed: () {
-                    Get.toNamed("/home");
+                  onPressed: () async {
+                    var response = await http.get(
+                      Uri.parse(
+                        "http://localhost/ACS314PROJECT/login.php?email=${emailController.text}&password=${passwordController.text}",
+                      ),
+                    );
+                    print(response.body);
+                    var responseBody = jsonDecode(response.body);
+
+                    int LoggedIn = responseBody['success'];
                     // Handle login button press
+
+                    if (LoggedIn == 1) {
+                      store.write("email", emailController.text);
+                      var responsebody;
+                      store.write("userID", responsebody['data'][0]['id']);
+                      Get.toNamed("/home");
+                    } else {
+                      Get.snackbar("Error", "Invalid email or password");
+                    }
                   },
                   color: primaryColor,
                   textColor: Colors.white,

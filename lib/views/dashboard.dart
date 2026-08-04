@@ -187,7 +187,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: expenseColor.withOpacity(0.1),
+                    backgroundColor: expenseColor,
 
                     child: Icon(Icons.fastfood, color: expenseColor),
                   ),

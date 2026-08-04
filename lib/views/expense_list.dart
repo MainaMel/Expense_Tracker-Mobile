@@ -113,7 +113,7 @@ class _ExpenseListState extends State<ExpenseListScreen> {
 
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: expenseColor.withOpacity(0.1),
+                    backgroundColor: expenseColor,
 
                     child: Icon(Icons.directions_car, color: expenseColor),
                   ),
@@ -176,7 +176,7 @@ class _ExpenseListState extends State<ExpenseListScreen> {
 
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: expenseColor.withOpacity(0.1),
+                    backgroundColor: expenseColor,
 
                     child: Icon(Icons.shopping_cart, color: expenseColor),
                   ),
