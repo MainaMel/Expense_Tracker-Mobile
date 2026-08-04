@@ -115,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
 
             TextField(
-              // controller: passwordController,
+              controller: passwordController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -153,8 +153,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     if (LoggedIn == 1) {
                       store.write("email", emailController.text);
-                      var responsebody;
-                      store.write("userID", responsebody['data'][0]['id']);
+
+                      store.write("userID", responseBody['data'][0]['id']);
                       Get.toNamed("/home");
                     } else {
                       Get.snackbar("Error", "Invalid email or password");
