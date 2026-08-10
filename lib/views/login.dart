@@ -3,15 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
-
 import 'package:flutter_application_1/configs/colors.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
-
-TextEditingController emailController = TextEditingController();
-TextEditingController passwordController = TextEditingController();
-
-var store = GetStorage();
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,6 +15,18 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  var store = GetStorage();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     emailController.text = store.read("email") ?? "";
@@ -121,14 +127,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
 
-                // enabledBorder: OutlineInputBorder(
-                //   borderRadius: BorderRadius.circular(12),
-                //   borderSide: BorderSide(color: Colors.grey.shade400),
-                // ),
-                // focusedBorder: OutlineInputBorder(
-                //   borderRadius: BorderRadius.circular(12),
-                //   borderSide: BorderSide(color: primaryColor, width: 2),
-                // ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey.shade400),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: primaryColor, width: 2),
+                ),
                 prefixIcon: Icon(Icons.lock),
               ),
             ),
@@ -142,7 +148,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () async {
                     var response = await http.get(
                       Uri.parse(
-                        "http://localhost/ACS314PROJECT/login.php?email=${emailController.text}&password=${passwordController.text}",
+                        "http://localhost/ACS314PROJECT/login.php"
+                        "?email=${Uri.encodeComponent(emailController.text)}&password=${Uri.encodeComponent(passwordController.text)}",
                       ),
                     );
                     print(response.body);
@@ -152,9 +159,24 @@ class _LoginScreenState extends State<LoginScreen> {
                     // Handle login button press
 
                     if (LoggedIn == 1) {
-                      store.write("email", emailController.text);
-
-                      store.write("userID", responseBody['data'][0]['id']);
+                      store.write("email", responseBody['data'][0]['email']);
+                      store.write("userID", responseBody['data'][0]['Id']);
+                      store.write(
+                        "first_name",
+                        responseBody['data'][0]['f_name'],
+                      );
+                      store.write(
+                        "last_name",
+                        responseBody['data'][0]['l_name'],
+                      );
+                      store.write(
+                        "phone_number",
+                        responseBody['data'][0]['phone_number'],
+                      );
+                      store.write(
+                        "profile_pic",
+                        responseBody['data'][0]['profile_pic'],
+                      );
                       Get.toNamed("/home");
                     } else {
                       Get.snackbar("Error", "Invalid email or password");
