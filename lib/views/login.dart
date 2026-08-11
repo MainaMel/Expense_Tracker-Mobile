@@ -160,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     if (LoggedIn == 1) {
                       store.write("email", responseBody['data'][0]['email']);
-                      store.write("userID", responseBody['data'][0]['Id']);
+                      store.write("userID", responseBody['data'][0]['ID']);
                       store.write(
                         "first_name",
                         responseBody['data'][0]['f_name'],
