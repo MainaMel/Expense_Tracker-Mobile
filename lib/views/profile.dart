@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/configs/colors.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 class ProfileScreen extends StatefulWidget {
@@ -29,14 +30,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late TextEditingController emailController;
   late TextEditingController phoneController;
 
-  XFile? selectedImage;
+  // XFile? selectedImage;
   Uint8List? imageBytes;
+  String? profilePic;
 
   @override
   void initState() {
     super.initState();
 
     checkStorage();
+    profilePic = store.read("profile_pic");
+    print(
+      "PROFILE IMAGE URL: http://localhost/ACS314PROJECT/profile_pics/$profilePic",
+    );
 
     nameController = TextEditingController(
       text: "${store.read("first_name") ?? ""} ${store.read("last_name") ?? ""}"
@@ -65,7 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final bytes = await image.readAsBytes();
 
     setState(() {
-      selectedImage = image;
+      // selectedImage = image;
       imageBytes = bytes;
     });
 
@@ -73,7 +79,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (userID == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("User ID not found. Please login again.")),
+        SnackBar(content: Text("User ID not found. Please login again.")),
       );
       return;
     }
@@ -104,12 +110,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         var responseData = jsonDecode(response.body);
 
         if (responseData['success'] == 1) {
-          store.write("profile_pic", responseData['profile_pic']);
+          setState(() {
+            profilePic = responseData['profile_pic'];
+          });
+
+          store.write("profile_pic", profilePic);
 
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Profile picture updated successfully"),
-            ),
+            SnackBar(content: Text("Profile picture updated successfully")),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -122,15 +130,81 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Server error. Please try again.")),
+          SnackBar(content: Text("Server error. Please try again.")),
         );
       }
     } catch (e) {
       print("UPLOAD ERROR: $e");
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Could not upload profile picture")),
+        SnackBar(content: Text("Could not upload profile picture")),
       );
+    }
+  }
+
+  Future<void> updateProfile() async {
+    final userID = store.read("userID");
+
+    if (userID == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("User ID not found. Please login again.")),
+      );
+      return;
+    }
+
+    // Separating the full name into f_name and l_name
+    List<String> names = nameController.text.trim().split(" ");
+
+    String firstName = names.isNotEmpty ? names.first : "";
+    String lastName = names.length > 1 ? names.sublist(1).join(" ") : "";
+
+    try {
+      var response = await http.post(
+        Uri.parse('http://localhost/ACS314PROJECT/edit_profile.php'),
+        body: {
+          'userID': userID.toString(),
+          'first_name': firstName,
+          'last_name': lastName,
+          'email': emailController.text.trim(),
+          'phone': phoneController.text.trim(),
+        },
+      );
+
+      print("UPDATE PROFILE RESPONSE: ${response.body}");
+
+      if (response.statusCode == 200) {
+        var responseData = jsonDecode(response.body);
+
+        if (responseData['success'] == 1) {
+          // Update GetStorage with the new information
+          store.write("first_name", firstName);
+          store.write("last_name", lastName);
+          store.write("email", emailController.text.trim());
+          store.write("phone_number", phoneController.text.trim());
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Profile updated successfully")),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                responseData['message'] ?? "Failed to update profile",
+              ),
+            ),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Server error. Please try again.")),
+        );
+      }
+    } catch (e) {
+      print("UPDATE PROFILE ERROR: $e");
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Could not update profile")));
     }
   }
 
@@ -170,10 +244,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     CircleAvatar(
                       radius: 50,
                       backgroundColor: primaryColor,
+
                       backgroundImage: imageBytes != null
                           ? MemoryImage(imageBytes!)
+                          : (profilePic != null && profilePic!.isNotEmpty)
+                          ? NetworkImage(
+                              "http://localhost/ACS314PROJECT/profile_pics/$profilePic",
+                            )
                           : null,
-                      child: imageBytes == null
+
+                      child:
+                          imageBytes == null &&
+                              (profilePic == null || profilePic!.isEmpty)
                           ? Icon(Icons.person, size: 50, color: Colors.white)
                           : null,
                     ),
@@ -264,11 +346,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 height: 50,
 
                 child: ElevatedButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Profile updated successfully")),
-                    );
-                  },
+                  onPressed: updateProfile,
 
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
@@ -298,9 +376,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 child: ElevatedButton(
                   onPressed: () {
-                    // Logout logic will be connected later
+                    store.remove("userID");
+                    store.remove("email");
+                    store.remove("first_name");
+                    store.remove("last_name");
+                    store.remove("phone_number");
+                    store.remove("profile_pic");
 
-                    Navigator.pop(context);
+                    Get.offAllNamed("/");
                   },
 
                   style: ElevatedButton.styleFrom(

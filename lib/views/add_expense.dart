@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/configs/colors.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:http/http.dart' as http;
 
 class AddExpenseScreen extends StatefulWidget {
   const AddExpenseScreen({super.key});
@@ -9,7 +13,43 @@ class AddExpenseScreen extends StatefulWidget {
 }
 
 class _AddExpenseScreenState extends State<AddExpenseScreen> {
+  List<Map<String, dynamic>> categories = [];
+
+  final store = GetStorage();
+
+  final TextEditingController amountController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+
+  int? selectedCategory;
   DateTime? selectedDate;
+
+  @override
+  void initState() {
+    super.initState();
+    getCategories();
+  }
+
+  Future<void> getCategories() async {
+    try {
+      var response = await http.get(
+        Uri.parse('http://localhost/ACS314PROJECT/get_categories.php'),
+      );
+
+      print("CATEGORIES RESPONSE: ${response.body}");
+
+      if (response.statusCode == 200) {
+        var responseData = jsonDecode(response.body);
+
+        if (responseData['success'] == 1) {
+          setState(() {
+            categories = List<Map<String, dynamic>>.from(responseData['data']);
+          });
+        }
+      }
+    } catch (e) {
+      print("GET CATEGORIES ERROR: $e");
+    }
+  }
 
   Future<void> pickDate() async {
     DateTime? pickedDate = await showDatePicker(
@@ -19,7 +59,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
       firstDate: DateTime(2020),
 
-      lastDate: DateTime(2030),
+      lastDate: DateTime.now(),
     );
 
     if (pickedDate != null) {
@@ -27,6 +67,110 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         selectedDate = pickedDate;
       });
     }
+  }
+
+  Future<void> saveExpense() async {
+    print("SAVE EXPENSE BUTTON CLICKED");
+    // Get logged-in user's ID
+    final userID = store.read("userID");
+
+    // Check user ID
+    if (userID == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("User ID not found. Please login again.")),
+      );
+      return;
+    }
+
+    // Check amount
+    final amount = double.tryParse(amountController.text.trim());
+
+    if (amount == null || amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please enter a valid amount greater than 0.")),
+      );
+      return;
+    }
+
+    // Check category
+    if (selectedCategory == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Please select a category.")));
+      return;
+    }
+
+    // Check date
+    if (selectedDate == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Please select a date.")));
+      return;
+    }
+
+    try {
+      // Format date as YYYY-MM-DD
+      String formattedDate =
+          "${selectedDate!.year}-"
+          "${selectedDate!.month.toString().padLeft(2, '0')}-"
+          "${selectedDate!.day.toString().padLeft(2, '0')}";
+
+      // Send data to PHP API
+      var response = await http.post(
+        Uri.parse('http://localhost/ACS314PROJECT/add_expense.php'),
+        body: {
+          'user_ID': userID.toString(),
+          'category': selectedCategory.toString(),
+          'amount': amount.toString(),
+          'description': descriptionController.text.trim(),
+          'expense_date': formattedDate,
+        },
+      );
+
+      print("ADD EXPENSE RESPONSE: ${response.body}");
+
+      if (response.statusCode == 200) {
+        var responseData = jsonDecode(response.body);
+
+        if (responseData['success'] == 1) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text("Expense added successfully")));
+
+          // Clear the form
+          amountController.clear();
+          descriptionController.clear();
+
+          setState(() {
+            selectedCategory = null;
+            selectedDate = null;
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(responseData['message'] ?? "Failed to add expense"),
+            ),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Server error. Please try again.")),
+        );
+      }
+    } catch (e) {
+      print("ADD EXPENSE ERROR: $e");
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Could not add expense")));
+    }
+  }
+
+  @override
+  void dispose() {
+    amountController.dispose();
+    descriptionController.dispose();
+    super.dispose();
   }
 
   @override
@@ -57,7 +201,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               SizedBox(height: 8),
 
               TextField(
-                keyboardType: TextInputType.number,
+                controller: amountController,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
 
                 decoration: InputDecoration(
                   hintText: "Enter Amount",
@@ -92,7 +237,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
               SizedBox(height: 8),
 
-              DropdownButtonFormField<String>(
+              DropdownButtonFormField<int>(
                 decoration: InputDecoration(
                   hintText: "Select category",
 
@@ -111,16 +256,18 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   ),
                 ),
 
-                items: ["Food", "Transport", "Shopping", "Bills", "Other"].map((
-                  category,
-                ) {
-                  return DropdownMenuItem(
-                    value: category,
-                    child: Text(category),
+                items: categories.map((category) {
+                  return DropdownMenuItem<int>(
+                    value: int.parse(category["category_id"].toString()),
+                    child: Text(category["category_name"].toString()),
                   );
                 }).toList(),
 
-                onChanged: (value) {},
+                onChanged: (value) {
+                  setState(() {
+                    selectedCategory = value;
+                  });
+                },
               ),
 
               //DATE
@@ -170,24 +317,24 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               ),
 
               // Date TextField ends here
-              TextField(
-                readOnly: true,
+              // TextField(
+              //   readOnly: true,
 
-                decoration: InputDecoration(
-                  hintText: "Select Date",
+              //   decoration: InputDecoration(
+              //     hintText: "Select Date",
 
-                  suffixIcon: Icon(Icons.calendar_today, color: primaryColor),
+              //     suffixIcon: Icon(Icons.calendar_today, color: primaryColor),
 
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+              //     border: OutlineInputBorder(
+              //       borderRadius: BorderRadius.circular(12),
+              //     ),
 
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey.shade400),
-                  ),
-                ),
-              ),
+              //     enabledBorder: OutlineInputBorder(
+              //       borderRadius: BorderRadius.circular(12),
+              //       borderSide: BorderSide(color: Colors.grey.shade400),
+              //     ),
+              //   ),
+              // ),
 
               // Description section starts here
               SizedBox(height: 20),
@@ -204,6 +351,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               SizedBox(height: 8),
 
               TextField(
+                controller: descriptionController,
                 maxLines: 3,
 
                 decoration: InputDecoration(
@@ -227,14 +375,14 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 ),
               ),
 
-              const SizedBox(height: 30),
+              SizedBox(height: 30),
 
               SizedBox(
                 width: double.infinity,
                 height: 50,
 
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: saveExpense,
 
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
@@ -246,7 +394,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     ),
                   ),
 
-                  child: const Text(
+                  child: Text(
                     "Save Expense",
 
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),

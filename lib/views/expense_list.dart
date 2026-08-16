@@ -8,9 +8,6 @@ class ExpenseListScreen extends StatefulWidget {
   State<ExpenseListScreen> createState() => _ExpenseListState();
 }
 
-// ignore: unused_element
-class _ExpenseListScreenState {}
-
 class _ExpenseListState extends State<ExpenseListScreen> {
   @override
   Widget build(BuildContext context) {

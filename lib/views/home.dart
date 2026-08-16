@@ -19,9 +19,9 @@ var userList = [];
 
 int position = 0;
 var screens = [
+  DashboardScreen(),
   AddExpenseScreen(),
   ExpenseListScreen(),
-  DashboardScreen(),
   ProfileScreen(),
   SettingsScreen(),
 ];
@@ -48,12 +48,11 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: CurvedNavigationBar(
         backgroundColor: secondaryColor,
         items: <Widget>[
-          Icon(Icons.add, size: 10),
-          Icon(Icons.view_column, size: 25),
           Icon(Icons.dashboard, size: 25),
+          Icon(Icons.add, size: 25),
+          Icon(Icons.view_column, size: 25),
           Icon(Icons.person, size: 25),
           Icon(Icons.settings, size: 25),
-          // Icon(Icons.settings, size: 30),
         ],
         onTap: (index) {
           setState(() {
